@@ -77,8 +77,11 @@ body{margin:0;background:var(--sky-bottom);color:var(--ink);font-family:var(--ui
 .tile{width:clamp(30px,4.6vmin,52px);height:clamp(30px,4.6vmin,52px);border-radius:10px;border:3px solid transparent;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:clamp(16px,2.7vmin,28px);background:#ffffffaa;color:var(--ink-soft);cursor:pointer;padding:0}
 .tile.on{border-color:var(--ink)}
 .tile.seen{color:#fff}
-.album{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;font-weight:800;color:var(--ink-soft);font-size:18px}
-.album .e{font-family:var(--emoji);font-size:30px}
+.album{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;font-family:var(--ui);font-weight:800;color:var(--ink-soft);font-size:clamp(14px,2.2vmin,18px);border:0;background:transparent;border-radius:999px;padding:6px 14px;cursor:pointer;transition:transform .15s,background .15s}
+.album:hover{transform:translateY(-3px);background:#ffffff80}
+.album:active{transform:translateY(1px)}
+.album .e{font-family:var(--emoji);font-size:clamp(22px,4.2vmin,30px)}
+.album .more{font-family:var(--display);font-weight:900;color:var(--ink);font-size:clamp(14px,2.4vmin,20px)}
 
 /* MASCOT */
 .guide{display:flex;align-items:center;gap:14px;justify-content:center}
@@ -173,6 +176,18 @@ body{margin:0;background:var(--sky-bottom);color:var(--ink);font-family:var(--ui
 label.tg{display:flex;align-items:center;gap:10px;font-weight:800;cursor:pointer}
 label.tg input{width:22px;height:22px}
 
+/* ALBUM */
+.albumcard{background:var(--paper);border-radius:28px;padding:clamp(16px,3vmin,30px);width:min(860px,100%);max-height:92%;overflow:auto;box-sizing:border-box;box-shadow:0 10px 0 #0003;text-align:center;animation:dipin .6s cubic-bezier(.3,1.5,.5,1) both}
+.albumcard h2{font-family:var(--display);font-weight:900;color:var(--plum);font-size:clamp(26px,5.2vmin,48px);margin:0}
+.albumcard .cnt{font-weight:800;color:var(--ink-soft);font-size:clamp(14px,2.4vmin,20px);margin:6px 0 16px}
+.acards{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:clamp(8px,1.6vmin,14px)}
+.acard{position:relative;border:0;padding:0;aspect-ratio:1;min-height:clamp(62px,12vmin,96px);border-radius:18px;display:grid;place-items:center;font-family:var(--emoji);font-size:clamp(32px,6.6vmin,54px);line-height:1;cursor:pointer;box-shadow:0 6px 0 #0003;transition:transform .15s}
+.acard:hover{transform:translateY(-5px) rotate(-3deg)}
+.acard:active{transform:translateY(2px)}
+.acard.lock{background:#2a1f3d12;box-shadow:none;color:#2a1f3d2e;font-family:var(--display);font-weight:900}
+.acard .n{position:absolute;right:-5px;top:-7px;background:var(--red);color:#fff;font-family:var(--ui);font-weight:900;font-size:13px;border-radius:999px;padding:2px 7px;box-shadow:0 2px 0 #0003}
+.acard.boom{animation:sticker .9s cubic-bezier(.3,1.6,.5,1)}
+
 /* DIPLOMA */
 .diploma-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;max-height:100%;overflow:auto;padding-block:16px}
 .diploma{position:relative;background:var(--paper);color:var(--ink);width:min(900px,100%);border-radius:22px;padding:44px clamp(18px,5vw,64px) 52px;text-align:center;box-shadow:0 14px 0 #0003;animation:dipin 1s cubic-bezier(.3,1.5,.5,1) both;overflow:hidden}
@@ -244,7 +259,7 @@ label.tg input{width:22px;height:22px}
     </div>
     <div class="strip" id="strip"></div>
     <div class="row" style="justify-content:center;margin:0"><span class="progress" id="progress"></span><button class="btn dipbtn" id="dipBtn" hidden>🏅 Диплома</button></div>
-    <div class="album" id="album"></div>
+    <button class="album" id="album" aria-label="Моят албум със стикери"></button>
   </section>
 
   <!-- LEARN -->
@@ -314,6 +329,15 @@ label.tg input{width:22px;height:22px}
   </div>
 </div>
 
+<div class="overlay" id="albumOv" hidden>
+  <div class="albumcard" role="dialog" aria-labelledby="albumTitle">
+    <h2 id="albumTitle">Моят албум</h2>
+    <div class="cnt" id="albumCnt"></div>
+    <div class="acards" id="acards"></div>
+    <div class="row" style="justify-content:center;margin-top:20px"><button class="btn" id="albumClose" style="font-size:26px;padding:12px 36px">Затвори</button></div>
+  </div>
+</div>
+
 <div class="overlay" id="parent" hidden>
   <div class="panel" role="dialog" aria-labelledby="pTitle">
     <h2 id="pTitle">За родителя</h2>
@@ -346,10 +370,11 @@ label.tg input{width:22px;height:22px}
 <script>
 (function(){
 const STORK='<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round"><line x1="98" y1="132" x2="88" y2="192" stroke="#e2392b" stroke-width="6"/><line x1="112" y1="132" x2="120" y2="192" stroke="#e2392b" stroke-width="6"/><path d="M72 102 Q58 66 62 40" stroke="#2a1f3d" stroke-width="20" fill="none"/><path d="M72 102 Q58 66 62 40" stroke="#ffffff" stroke-width="13" fill="none"/><ellipse cx="108" cy="112" rx="50" ry="30" fill="#ffffff" stroke="#2a1f3d" stroke-width="4"/><path d="M118 92 Q170 96 168 128 Q142 124 116 126 Z" fill="#2a1f3d"/><circle cx="62" cy="38" r="15" fill="#ffffff" stroke="#2a1f3d" stroke-width="4"/><circle cx="58" cy="35" r="3.5" fill="#2a1f3d"/><path d="M50 38 L8 50 L50 46 Z" fill="#e2392b"/></g></svg>';
+const IGLOO='<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><g stroke-linecap="round" stroke-linejoin="round"><g stroke="#8fd4ea" stroke-width="3.5" fill="none"><path d="M24 26 V44 M15 35 H33 M18 29 L30 41 M30 29 L18 41"/><path d="M178 52 V66 M171 59 H185 M173 54 L183 64 M183 54 L173 64"/></g><circle cx="166" cy="22" r="4.5" fill="#8fd4ea"/><circle cx="18" cy="72" r="4" fill="#8fd4ea"/><path d="M6 182 Q54 168 100 170 Q146 168 194 182 Q146 192 100 190 Q54 192 6 182 Z" fill="#d7edf8"/><path d="M5 176 A95 116 0 0 1 195 176 Z" fill="#ffffff" stroke="#2a1f3d" stroke-width="5"/><g stroke="#a9d6e6" stroke-width="4" fill="none"><path d="M37.3 176 A62.7 76.6 0 0 1 162.7 176 M62 176 A38 46.4 0 0 1 138 176 M8.7 144 L39.7 154.9 M34 92.6 L56.4 120.9 M80.2 62.5 L87 101.1 M119.8 62.5 L113 101.1 M166 92.6 L143.6 120.9 M191.3 144 L160.3 154.9 M46.8 135.4 L67.8 151.4 M70.6 108.4 L82.2 135 M129.4 108.4 L117.8 135 M153.2 135.4 L132.2 151.4"/></g><path d="M72 176 L72 150 A28 24 0 0 1 128 150 L128 176 Z" fill="#ffffff" stroke="#2a1f3d" stroke-width="5"/><path d="M85 176 L85 155 A15 14 0 0 1 115 155 L115 176 Z" fill="#2a1f3d"/></g></svg>';
 const L=[
  ['А','а','АНАНАС','🍍','а'],['Б','б','БАНАН','🍌','бъ'],['В','в','ВЛАК','🚂','въ'],['Г','г','ГЪБА','🍄','гъ'],
  ['Д','д','ДЪРВО','🌳','дъ'],['Е','е','ЕДНОРОГ','🦄','е'],['Ж','ж','ЖАБА','🐸','жъ'],['З','з','ЗАЙЧЕ','🐰','зъ'],
- ['И','и','ИГРАЧКА','🧸','и'],['Й','й','ЙО-ЙО','🪀','и кратко'],['К','к','КОТКА','🐱','къ'],['Л','л','ЛЪВ','🦁','лъ'],
+ ['И','и','ИГЛУ',IGLOO,'и'],['Й','й','ЙО-ЙО','🪀','и кратко'],['К','к','КОТКА','🐱','къ'],['Л','л','ЛЪВ','🦁','лъ'],
  ['М','м','МЕЧКА','🐻','мъ'],['Н','н','НОСОРОГ','🦏','нъ'],['О','о','ОХЛЮВ','🐌','о'],['П','п','ПИЛЕ','🐥','пъ'],
  ['Р','р','РИБА','🐟','ръ'],['С','с','СЛОН','🐘','съ'],['Т','т','ТОРТА','🎂','тъ'],['У','у','УХО','👂','у'],
  ['Ф','ф','ФЛАМИНГО','🦩','фъ'],['Х','х','ХЕЛИКОПТЕР','🚁','хъ'],['Ц','ц','ЦВЕТЕ','🌸','цъ'],['Ч','ч','ЧАДЪР','☂️','чъ'],
@@ -358,7 +383,7 @@ const L=[
 ].map(function(a,i){return {i:i,up:a[0],lo:a[1],word:a[2],pic:a[3],name:a[4]};});
 const COLORS=['var(--red)','var(--teal)','var(--plum)','var(--orange)','var(--blue)','var(--pink)','var(--grass-dark)'];
 const col=function(i){return COLORS[i%COLORS.length];};
-const STICKERS=['🦊','🐼','🐨','🐯','🐵','🐧','🐙','🦖','🐳','🦋','🐞','🐢','🦒','🐬','🦉','🐝','🚀','🌈','🚒','🎠','🦕','🐠','🍦','🎡'];
+const STICKERS=[['🦊','лисиче'],['🐼','панда'],['🐨','коала'],['🐯','тигърче'],['🐵','маймунка'],['🐧','пингвин'],['🐙','октопод'],['🦖','динозавър'],['🐳','кит'],['🦋','пеперуда'],['🐞','калинка'],['🐢','костенурка'],['🦒','жираф'],['🐬','делфин'],['🦉','бухал'],['🐝','пчеличка'],['🚀','ракета'],['🌈','дъга'],['🚒','пожарна кола'],['🎠','въртележка'],['🦕','бронтозавър'],['🐠','рибка'],['🍦','сладолед'],['🎡','виенско колело']];
 const $=function(id){return document.getElementById(id);};
 
 /* ---------- state ---------- */
@@ -441,8 +466,8 @@ function giveStar(x,y){
 let afterParty=null;
 function showSticker(){
   const st=STICKERS[(S.stickers-1)%STICKERS.length];
-  $('partyE').textContent=st;$('partyH').textContent='Браво!';$('partyP').textContent='Нов стикер в албума!';
-  $('party').hidden=false;sfx.fanfare();rain();speak('Браво! Нов стикер!');
+  $('partyE').textContent=st[0];$('partyH').textContent='Браво!';$('partyP').textContent='Нов стикер в албума: '+st[1]+'!';
+  $('party').hidden=false;sfx.fanfare();rain();speak('Браво! Нов стикер: '+st[1]+'!');
 }
 function showParty(e,h,p,cb){$('partyE').textContent=e;$('partyH').textContent=h;$('partyP').textContent=p;afterParty=cb||null;$('party').hidden=false;sfx.fanfare();rain();speak(h);}
 $('partyOk').onclick=function(){$('party').hidden=true;const cb=afterParty;afterParty=null;if(cb)cb();};
@@ -475,10 +500,47 @@ function renderHome(){
   const done=S.seen.length>=L.length;
   $('progress').textContent=done?'':'Научени букви: '+S.seen.length+' / '+L.length;
   $('progress').hidden=done;$('dipBtn').hidden=!done;
-  const al=$('album');al.innerHTML='';
-  if(S.stickers>0){const lab=document.createElement('span');lab.textContent='Албум:';al.appendChild(lab);for(let i=0;i<S.stickers;i++){const e=document.createElement('span');e.className='e';e.textContent=STICKERS[i%STICKERS.length];al.appendChild(e);}}
-  else{al.textContent='Събери 5 звездички за първия стикер!';}
+  renderHomeAlbum();
 }
+
+/* ---------- album ---------- */
+const HOME_STICKERS=8;
+function renderHomeAlbum(){
+  const al=$('album');al.innerHTML='';
+  const lab=document.createElement('span');
+  if(!S.stickers){lab.textContent='🎁 Събери 5 звездички за първия стикер!';al.appendChild(lab);return;}
+  const from=Math.max(0,S.stickers-HOME_STICKERS);
+  lab.textContent='🎁 Албум:';al.appendChild(lab);
+  if(from>0){const m=document.createElement('span');m.className='more';m.textContent='+'+from;al.appendChild(m);}
+  for(let i=from;i<S.stickers;i++){const e=document.createElement('span');e.className='e';e.textContent=STICKERS[i%STICKERS.length][0];al.appendChild(e);}
+  const go=document.createElement('span');go.className='more';go.textContent='\u25B8';al.appendChild(go);
+}
+function stickerTimes(k){return S.stickers>k?Math.floor((S.stickers-k-1)/STICKERS.length)+1:0;}
+function renderAlbum(){
+  $('albumCnt').textContent=S.stickers
+    ?'Стикери: '+S.stickers+' \u00B7 още '+(5-S.stars%5)+' \u2B50 за нов'
+    :'Събери 5 звездички и първият стикер е твой!';
+  const box=$('acards');box.innerHTML='';
+  STICKERS.forEach(function(st,k){
+    const n=stickerTimes(k),b=document.createElement('button');
+    b.className='acard'+(n?'':' lock');
+    if(n){
+      b.style.background=col(k);b.textContent=st[0];b.setAttribute('aria-label','Стикер: '+st[1]);
+      if(n>1){const t=document.createElement('span');t.className='n';t.textContent='\u00D7'+n;b.appendChild(t);}
+    }else{b.textContent='?';b.setAttribute('aria-label','Още не е спечелен');}
+    b.onclick=function(){
+      ac();b.classList.remove('boom');void b.offsetWidth;b.classList.add('boom');
+      if(n){sfx.chime();speak(st[1]);}else{sfx.boing();speak('Този още не е твой. Събери още звездички!');}
+    };
+    box.appendChild(b);
+  });
+}
+function showAlbum(){
+  renderAlbum();$('albumOv').hidden=false;sfx.whoosh();
+  speak(S.stickers?'Това е твоят албум!':'Тук ще си събираш стикери!');
+}
+$('album').onclick=function(){ac();showAlbum();};
+$('albumClose').onclick=function(){$('albumOv').hidden=true;if(current==='home')renderHome();};
 
 /* ---------- learn ---------- */
 let learnList=[],li=0,step=0,learnStart=null,learnBusy=false;
@@ -652,6 +714,7 @@ $('resetYes').onclick=function(){S.stars=0;S.stickers=0;S.seen=[];S.dipDate=0;sa
 
 /* ---------- keyboard ---------- */
 addEventListener('keydown',function(e){
+  if(!$('albumOv').hidden){if(e.key==='Escape')$('albumClose').click();return;}
   if(!$('diplomaOv').hidden){if(e.key==='Escape')$('dipClose').click();return;}
   if(!$('parent').hidden){if(e.key==='Escape')$('parentClose').click();return;}
   if(!$('party').hidden){if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight'){e.preventDefault();$('partyOk').click();}return;}
