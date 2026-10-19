@@ -173,7 +173,33 @@ body{margin:0;background:var(--sky-bottom);color:var(--ink);font-family:var(--ui
 label.tg{display:flex;align-items:center;gap:10px;font-weight:800;cursor:pointer}
 label.tg input{width:22px;height:22px}
 
+/* DIPLOMA */
+.diploma-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;max-height:100%;overflow:auto;padding-block:16px}
+.diploma{position:relative;background:var(--paper);color:var(--ink);width:min(900px,100%);border-radius:22px;padding:44px clamp(18px,5vw,64px) 52px;text-align:center;box-shadow:0 14px 0 #0003;animation:dipin 1s cubic-bezier(.3,1.5,.5,1) both;overflow:hidden}
+@keyframes dipin{0%{transform:scale(.3) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
+.diploma .stitch{position:absolute;left:0;right:0;height:16px;background-image:inherit}
+.diploma .stitch{background-color:var(--paper);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16' viewBox='0 0 32 16'%3E%3Cg shape-rendering='crispEdges'%3E%3Crect x='14' y='2' width='4' height='4' fill='%23e2392b'/%3E%3Crect x='10' y='6' width='4' height='4' fill='%23e2392b'/%3E%3Crect x='18' y='6' width='4' height='4' fill='%23e2392b'/%3E%3Crect x='14' y='10' width='4' height='4' fill='%23e2392b'/%3E%3Crect x='14' y='6' width='4' height='4' fill='%232a1f3d'/%3E%3Crect x='0' y='6' width='4' height='4' fill='%2314a39b'/%3E%3Crect x='28' y='6' width='4' height='4' fill='%2314a39b'/%3E%3C/g%3E%3C/svg%3E");background-size:32px 16px}
+.diploma .stitch.t{top:10px}.diploma .stitch.b{bottom:10px}
+.diploma h2{font-family:var(--display);font-weight:900;color:var(--red);font-size:clamp(44px,9vw,92px);letter-spacing:.08em;margin:6px 0 2px;line-height:1}
+.diploma .sub{font-weight:800;color:var(--ink-soft);font-size:clamp(15px,2.4vw,22px);margin:6px 0}
+.diploma .name{font-family:var(--display);font-weight:900;font-size:clamp(30px,6vw,60px);color:var(--plum);border:0;border-bottom:3px dashed #2a1f3d44;background:transparent;text-align:center;width:min(560px,100%);padding:4px 0;margin:8px 0;outline:none}
+.diploma .name::placeholder{color:#2a1f3d40}
+.diploma .name:focus{border-bottom-color:var(--plum)}
+.diploma .what{font-weight:900;font-size:clamp(17px,2.8vw,26px);margin:8px auto 18px;max-width:40ch;text-wrap:balance}
+.dletters{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto}
+.dletters span{font-family:var(--display);font-weight:900;color:#fff;border-radius:8px;font-size:clamp(16px,3vw,28px);padding:4px 0;animation:popin .4s cubic-bezier(.3,1.7,.5,1) both}
+.dfoot{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:22px;flex-wrap:wrap;padding-right:12px}
+.dfoot .date{font-weight:800;color:var(--ink-soft);font-size:18px;text-align:left}
+.dfoot .date b{display:block;color:var(--ink);font-size:20px}
+.seal{width:118px;height:118px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;transform:rotate(-12deg);box-shadow:0 0 0 6px var(--paper),0 0 0 9px var(--red);position:relative;animation:stamp .6s 1.2s cubic-bezier(.3,1.8,.5,1) both}
+@keyframes stamp{0%{transform:scale(3) rotate(-30deg);opacity:0}100%{transform:rotate(-12deg);opacity:1}}
+.seal .e{font-family:var(--emoji);font-size:46px;line-height:1}
+.seal small{position:absolute;bottom:16px;font-weight:900;font-size:11px;letter-spacing:.12em}
+.seal .stars{position:absolute;top:13px;font-size:12px;letter-spacing:2px}
+.dipbtn{background:var(--sun)!important;font-size:clamp(18px,2.6vmin,28px);padding:10px 26px}
+.progress{font-weight:900;color:var(--ink-soft);font-size:18px}
 @media (max-width:760px){
+
   .modes{grid-template-columns:repeat(2,minmax(0,1fr))}
   .learnstage{grid-template-columns:1fr;gap:2vmin}
   .block .up{font-size:24vmin}.block .lo{font-size:13vmin}
@@ -217,6 +243,7 @@ label.tg input{width:22px;height:22px}
       <button class="mode" data-go="balloons" style="background:var(--orange)"><span class="e">🎈</span>Балони</button>
     </div>
     <div class="strip" id="strip"></div>
+    <div class="row" style="justify-content:center;margin:0"><span class="progress" id="progress"></span><button class="btn dipbtn" id="dipBtn" hidden>🏅 Диплома</button></div>
     <div class="album" id="album"></div>
   </section>
 
@@ -267,6 +294,26 @@ label.tg input{width:22px;height:22px}
   <div class="party"><div class="e" id="partyE">🦊</div><h2 id="partyH">Браво!</h2><p id="partyP">Нов стикер в албума!</p><button class="btn" id="partyOk" style="font-size:32px;padding:14px 40px">Още! ▶</button></div>
 </div>
 
+<div class="overlay" id="diplomaOv" hidden>
+  <div class="diploma-wrap">
+    <div class="diploma" id="diplomaCard">
+      <div class="stitch t"></div>
+      <div class="sub">Таралежко и „Весела азбука“ удостоверяват, че</div>
+      <h2>ДИПЛОМА</h2>
+      <div class="sub">се присъжда на</div>
+      <input class="name" id="dipName" maxlength="40" placeholder="Име на детето" autocomplete="off">
+      <div class="what">за това, че познава всички 30 букви на българската азбука!</div>
+      <div class="dletters" id="dipLetters"></div>
+      <div class="dfoot">
+        <div class="date">Дата<b id="dipDate"></b><span id="dipStars"></span></div>
+        <div class="seal"><span class="stars">★★★</span><span class="e">🦔</span><small>ТАРАЛЕЖКО</small></div>
+      </div>
+      <div class="stitch b"></div>
+    </div>
+    <button class="btn" id="dipClose" style="font-size:26px;padding:12px 36px">Затвори</button>
+  </div>
+</div>
+
 <div class="overlay" id="parent" hidden>
   <div class="panel" role="dialog" aria-labelledby="pTitle">
     <h2 id="pTitle">За родителя</h2>
@@ -285,6 +332,9 @@ label.tg input{width:22px;height:22px}
     <label class="tg"><input type="checkbox" id="voiceOn"> Таралежко говори на глас</label>
     <div class="row"><span class="status" id="voiceStatus">Проверявам…</span></div>
     <label class="tg" style="margin-top:10px"><input type="checkbox" id="sfxOn"> Звукови ефекти</label>
+    <h3>Диплома</h3>
+    <p>Отключва се, когато детето мине през всичките 30 букви в „Буквите“.</p>
+    <div class="row"><button class="pbtn" id="dipPreview">Преглед на дипломата</button></div>
     <h3>Клавиши</h3>
     <p>Интервал / Enter / → – напред · ← – назад · 1–4 – избор · Esc – начало · F – цял екран</p>
     <h3>Напредък</h3>
@@ -422,6 +472,9 @@ function renderHome(){
   const set=setLetters();
   L.forEach(function(x){const t=document.createElement('button');t.className='tile'+(set.indexOf(x.i)>=0?' on':'')+(S.seen.indexOf(x.i)>=0?' seen':'');t.textContent=x.up;if(S.seen.indexOf(x.i)>=0)t.style.background=col(x.i);t.setAttribute('aria-label','Буква '+x.up);
     t.onclick=function(){ac();learnStart=x.i;show('learn');};strip.appendChild(t);});
+  const done=S.seen.length>=L.length;
+  $('progress').textContent=done?'':'Научени букви: '+S.seen.length+' / '+L.length;
+  $('progress').hidden=done;$('dipBtn').hidden=!done;
   const al=$('album');al.innerHTML='';
   if(S.stickers>0){const lab=document.createElement('span');lab.textContent='Албум:';al.appendChild(lab);for(let i=0;i<S.stickers;i++){const e=document.createElement('span');e.className='e';e.textContent=STICKERS[i%STICKERS.length];al.appendChild(e);}}
   else{al.textContent='Събери 5 звездички за първия стикер!';}
@@ -456,7 +509,8 @@ function revealWord(){
   if(x.i===26)$('lNote').textContent='Ъ е и в средата на думата: ЪГЪЛ';
   if(x.i===27)$('lNote').textContent='Ь не стои в началото на думи — живее в средата, като в ШОФЬОР.';
   setTimeout(function(){speak(x.word.toLowerCase());},x.word.length*120+200);
-  if(S.seen.indexOf(x.i)<0){S.seen.push(x.i);save();}
+  if(S.seen.indexOf(x.i)<0){S.seen.push(x.i);save();
+    if(S.seen.length===L.length){if(!S.dipDate){S.dipDate=Date.now();save();}setTimeout(function(){showDiploma(true);},x.word.length*120+3200);}}
   const r=w.getBoundingClientRect();
   setTimeout(function(){sfx.chime();burst(r.left+r.width/2,r.top+r.height/2,70);giveStar(r.left+r.width/2,r.top);},x.word.length*120+300);
 }
@@ -563,6 +617,25 @@ function hitBalloon(b,e){
   }else{b.el.classList.remove('no');void b.el.offsetWidth;b.el.classList.add('no');sfx.boing();b.sp*=1.8;speak('Това е '+L[b.i].name);}
 }
 
+/* ---------- diploma ---------- */
+function showDiploma(fresh){
+  const box=$('dipLetters');box.innerHTML='';
+  L.forEach(function(x,i){const s=document.createElement('span');s.textContent=x.up;s.style.background=col(i);s.style.animationDelay=(0.4+i*0.04)+'s';box.appendChild(s);});
+  const d=new Date(S.dipDate||Date.now());
+  $('dipDate').textContent=d.toLocaleDateString('bg-BG',{day:'numeric',month:'long',year:'numeric'});
+  $('dipStars').textContent='Събрани звездички: '+S.stars+' ⭐';
+  $('dipName').value=S.name||'';
+  const c=$('diplomaCard');c.style.animation='none';void c.offsetWidth;c.style.animation='';
+  $('party').hidden=true;$('parent').hidden=true;$('diplomaOv').hidden=false;
+  sfx.fanfare();rain();setTimeout(rain,1200);
+  speak(fresh?'Ура! Ти знаеш всички букви! Получаваш диплома!':'Браво! Това е твоята диплома!');
+}
+$('dipName').oninput=function(){S.name=this.value.trim();save();};
+$('dipName').onkeydown=function(e){e.stopPropagation();};
+$('dipClose').onclick=function(){$('diplomaOv').hidden=true;if(current==='home')renderHome();};
+$('dipBtn').onclick=function(){ac();showDiploma(false);};
+$('dipPreview').onclick=function(){ac();showDiploma(false);};
+
 /* ---------- parent panel ---------- */
 function renderChips(){
   const c=$('chips');c.innerHTML='';
@@ -575,10 +648,11 @@ document.querySelectorAll('[data-preset]').forEach(function(b){b.onclick=functio
 $('voiceOn').onchange=function(){S.voice=this.checked;save();if(S.voice)speak('Здравей!');};
 $('sfxOn').onchange=function(){S.sfx=this.checked;save();sfx.chime();};
 $('resetBtn').onclick=function(){$('resetYes').hidden=false;};
-$('resetYes').onclick=function(){S.stars=0;S.stickers=0;S.seen=[];save();renderStars();$('resetYes').hidden=true;};
+$('resetYes').onclick=function(){S.stars=0;S.stickers=0;S.seen=[];S.dipDate=0;save();renderStars();$('resetYes').hidden=true;};
 
 /* ---------- keyboard ---------- */
 addEventListener('keydown',function(e){
+  if(!$('diplomaOv').hidden){if(e.key==='Escape')$('dipClose').click();return;}
   if(!$('parent').hidden){if(e.key==='Escape')$('parentClose').click();return;}
   if(!$('party').hidden){if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight'){e.preventDefault();$('partyOk').click();}return;}
   if(e.key==='f'||e.key==='F'||e.key==='ф'||e.key==='Ф'){$('fsBtn').click();return;}
